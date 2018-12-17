@@ -1,0 +1,82 @@
+version: 1.0
+name: sync-app-apb
+description: Installs the Aerogear Sync Application
+bindable: True
+async: optional
+tags:
+  - mobile-service
+  - mobile-client-enabled
+metadata:
+  displayName: Sync App
+  console.openshift.io/iconClass: fa fa-refresh
+  #documentationUrl: "https://docs.aerogear.org/external/apb/sync-app.html"
+  providerDisplayName: "Red Hat, Inc."
+  serviceName: sync-app
+plans:
+  - name: default
+    description: This plan sets up the Sync Application
+    free: True
+    metadata: {}
+    parameters:
+      - name: SYNC_APP_DOCKER_IMAGE
+        description: URL of your Sync Application Docker Image, e.g. docker.io/aerogear/voyager-server-example-task
+        type: string
+        required: True
+        title: Sync Application Docker image
+      - name: SYNC_APP_DOCKER_IMAGE_VERSION
+        description: Version of your Sync Application Docker Image (using 'latest' if not specified)
+        type: string
+        required: False
+        title: Sync Application Docker image version
+      - name: SYNC_APP_HEALTH_ENDPOINT
+        description: Health Endpoint of your Sync Application (using '/' if not specified)
+        type: string
+        required: False
+        title: Sync Application health endpoint
+      - name: SYNC_APP_PORT
+        description: Port of the Sync Application to Expose
+        type: number
+        required: True
+        title: Sync App Port
+      - name: SYNC_APP_GRAPHQL_ENDPOINT
+        description: GraphQL Endpoint of your Sync Application (using 'graphql' if not specified)
+        type: string
+        required: False
+        title: Sync App GraphQL Endpoint
+      - name: DB_HOSTNAME
+        description: Hostname of the SQL Server
+        type: string
+        required: True
+        title: SQL Server Hostname
+      - name: DB_PORT
+        description: Port of the SQL Server
+        type: number
+        required: True
+        title: SQL Server Port
+      - name: DB_USERNAME
+        description: Username that will be used to connect to Database
+        type: string
+        required: True
+        title: SQL Server Username
+      - name: DB_PASSWORD
+        description: Password that will be used to connect to Database
+        type: string
+        required: True
+        title: SQL Server Password
+      - name: DB_NAME
+        description: Name of the SQL Server's database
+        type: string
+        required: True
+        title: Database name
+      - name: DB_SSL
+        description: Use SSL connection to SQL Server
+        type: boolean
+        display_type: checkbox
+        default: false
+        title: Use SSL?
+    bind_parameters:
+      - name: CLIENT_ID
+        required: True
+        title: Mobile Client ID
+        type: string
+        

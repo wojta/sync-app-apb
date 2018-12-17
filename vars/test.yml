@@ -1,0 +1,14 @@
+---
+
+sync_app_docker_image: "docker.io/aerogear/voyager-server-example-task"
+sync_app_docker_image_version: "latest"
+sync_app_health_endpoint: ""
+sync_app_graphql_endpoint: "graphql"
+SYNC_APP_PORT: 3000
+DB_HOSTNAME: "db.example.com"
+DB_PORT: "5671"
+DB_USERNAME: "user"
+DB_PASSWORD: "password"
+DB_NAME: "mydb"
+DB_SSL: "false"
+encode_asb_binding: false

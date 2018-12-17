@@ -1,0 +1,108 @@
+- name: Create sync-app deployment config
+  openshift_v1_deployment_config:
+    name: sync-app
+    namespace: '{{ namespace }}'
+    labels:
+      app: sync-app
+      service: sync-app
+    replicas: 1
+    selector:
+      app: sync-app
+      service: sync-app
+    spec_template_metadata_labels:
+      app: sync-app
+      service: sync-app
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - "sync-app"
+        from:
+          kind: ImageStreamTag
+          name: "sync-app:{{ sync_app_docker_image_version }}"
+          namespace: "{{ namespace }}"
+      type: ImageChange
+    - type: ConfigChange
+    containers:
+    - name: sync-app
+      image: '{{ sync_app_docker_image }}:{{ sync_app_docker_image_version }}'
+      imagePullPolicy: Always
+      readinessProbe:
+        httpGet:
+          path: '/{{ sync_app_health_endpoint }}'
+          port: '{{ SYNC_APP_PORT }}'
+        initialDelaySeconds: 15
+        timeoutSeconds: 1
+      env:
+      - name: DB_HOSTNAME
+        value: "{{ DB_HOSTNAME }}"
+      - name: DB_PORT
+        value: "{{ DB_PORT|string }}"
+      - name: DB_USERNAME
+        value: "{{ DB_USERNAME }}"
+      - name: DB_PASSWORD
+        value: "{{ DB_PASSWORD }}"
+      - name: DB_NAME
+        value: "{{ DB_NAME }}"
+      - name: DB_SSL
+        value: "{{ DB_SSL }}"
+
+- name: Create sync-app service
+  k8s_v1_service:
+    name: sync-app
+    namespace: '{{ namespace }}'
+    labels:
+      app: sync-app
+      service: sync-app
+    selector:
+      app: sync-app
+      service: sync-app
+    ports:
+      - name: web
+        port: 443
+        target_port: '{{ SYNC_APP_PORT }}'
+
+- name: Create sync-app https route
+  openshift_v1_route:
+    annotations:
+      console.alpha.openshift.io/overview-app-route: 'true'
+    name: sync-app
+    namespace: '{{ namespace }}'
+    labels:
+      app: sync-app
+      service: sync-app
+    to_name: sync-app
+    spec_port_target_port: web
+    tls_termination: edge
+    tls_insecure_edge_termination_policy: Redirect
+  register: sync_app_route
+
+- name: "Create ImageStream with tag {{ sync_app_docker_image_version }} for Sync App Docker Image"
+  openshift_v1_image_stream:
+    name: "sync-app"
+    namespace: "{{ namespace }}"
+    labels:
+      app: "sync-app"
+    lookup_policy_local: False
+    tags:
+      - name: "{{ sync_app_docker_image_version }}"
+        from:
+          kind: DockerImage
+          name: "{{ sync_app_docker_image }}:{{ sync_app_docker_image_version }}"
+        importPolicy:
+          scheduled: true
+
+# Check the containers in the sync-app pod and make sure they are all ready
+- name: "Wait for all sync-app containers to become ready"
+  shell: oc get pods --namespace={{ namespace }} --selector="deploymentconfig=sync-app" -o jsonpath='{.items[*].status.containerStatuses[?(@.ready==true)].ready}'| wc -w
+  register: aerogear_app_sync_app_result
+  until: aerogear_app_sync_app_result.stdout.find("1") != -1
+  retries: 30
+  delay: 10
+
+# This is currently needed until https://github.com/openshift/ansible-service-broker/issues/847 is resolved
+- name: "Make data available for binding"
+  asb_encode_binding:
+    fields:
+      namespace: "{{ namespace }}"
+  when: encode_asb_binding

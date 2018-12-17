@@ -1,0 +1,6 @@
+name: sync-app
+title: AeroGear Sync App
+version: 'latest'
+start_ROOT: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc
