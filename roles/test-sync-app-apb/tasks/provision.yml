@@ -1,0 +1,6 @@
+---
+
+- name: "Test|Check that data-sync secret exists"
+  shell: "oc get secrets -o name | grep sync-app"
+  register: sync_secret
+  failed_when: "'sync-app' not in sync_secret.stdout"

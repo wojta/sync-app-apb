@@ -1,0 +1,7 @@
+sync_app_docker_image: "{{ SYNC_APP_DOCKER_IMAGE }}"
+sync_app_docker_image_version: "{{ SYNC_APP_DOCKER_IMAGE_VERSION | default('latest', true) }}"
+sync_app_health_endpoint: "{{ SYNC_APP_HEALTH_ENDPOINT | default('', true) }}"
+sync_app_graphql_endpoint: "{{ SYNC_APP_GRAPHQL_ENDPOINT | default('graphql', true) }}"
+
+
+
