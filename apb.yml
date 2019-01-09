@@ -7,7 +7,7 @@ tags:
   - mobile-service
   - mobile-client-enabled
 metadata:
-  displayName: Sync App
+  displayName: Pokusna Sync App
   console.openshift.io/iconClass: fa fa-refresh
   #documentationUrl: "https://docs.aerogear.org/external/apb/sync-app.html"
   providerDisplayName: "Red Hat, Inc."
